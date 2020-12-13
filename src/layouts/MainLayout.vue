@@ -1,133 +1,72 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <!-- <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="leftDrawerOpen = !leftDrawerOpen"
-        /> -->
+	<q-layout view="lHh Lpr lFf">
+		<q-header elevated>
+			<q-toolbar>
+				<!-- <q-btn 
+					v-if="title == 'Chat'"
+					round
+					flat 
+					icon="arrow_back"
+					to="/" 
+				/> -->
 
-        <q-btn 
-			v-if="title == 'Chat'"
-          	round
-			flat 
-			icon="arrow_back"
-			to="/" 
-		/>
+				<q-toolbar-title class="absolute-center">
+					{{title}} 
+					<!-- {{ userDetails.userId }} -->
+				</q-toolbar-title>
 
-        <q-toolbar-title class="absolute-center">
-          {{title}}
-        </q-toolbar-title>
-
-		<q-btn 
-			class="absolute-right"
-			icon="account_circle"
-			no-caps
-			flat
-			label="Login" 
-			to="/auth"
-		/>
-
-        <!-- <div>Quasar v{{ $q.version }}</div> -->
-      </q-toolbar>
-    </q-header>
-
-    <!-- <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-      content-class="bg-grey-1"
-    >
-      <q-list>
-        <q-item-label
-          header
-          class="text-grey-8"
-        >
-          Essential Links
-        </q-item-label>
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer> -->
-
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
+				<q-btn 
+					v-if="!userDetails.userId"
+					class="absolute-right"
+					icon="account_circle"
+					no-caps
+					flat
+					label="Login" 
+					to="/auth"
+				/>
+				<q-btn 
+					v-else
+					@click="logoutUser"
+					class="absolute-right"
+					icon="account_circle"
+					no-caps
+					flat
+					dense
+					label="Logout"
+				/>
+			</q-toolbar>
+		</q-header>
+		
+		<q-page-container>
+			<router-view />
+		</q-page-container>
+	</q-layout>
 </template>
 
 <script>
-// import EssentialLink from 'components/EssentialLink.vue'
+import { mapState, mapActions } from 'vuex';
 
-// const linksData = [
-//   {
-//     title: 'Docs',
-//     caption: 'quasar.dev',
-//     icon: 'school',
-//     link: 'https://quasar.dev'
-//   },
-//   {
-//     title: 'Github',
-//     caption: 'github.com/quasarframework',
-//     icon: 'code',
-//     link: 'https://github.com/quasarframework'
-//   },
-//   {
-//     title: 'Discord Chat Channel',
-//     caption: 'chat.quasar.dev',
-//     icon: 'chat',
-//     link: 'https://chat.quasar.dev'
-//   },
-//   {
-//     title: 'Forum',
-//     caption: 'forum.quasar.dev',
-//     icon: 'record_voice_over',
-//     link: 'https://forum.quasar.dev'
-//   },
-//   {
-//     title: 'Twitter',
-//     caption: '@quasarframework',
-//     icon: 'rss_feed',
-//     link: 'https://twitter.quasar.dev'
-//   },
-//   {
-//     title: 'Facebook',
-//     caption: '@QuasarFramework',
-//     icon: 'public',
-//     link: 'https://facebook.quasar.dev'
-//   },
-//   {
-//     title: 'Quasar Awesome',
-//     caption: 'Community Quasar projects',
-//     icon: 'favorite',
-//     link: 'https://awesome.quasar.dev'
-//   }
-// ];
+this.$forceUpdate();
 
 export default {
   name: 'MainLayout',
   computed: {
+    ...mapState('store', ['userDetails']),
     title() {
-      // console.log(this.$route);
       let currentPath = this.$route.fullPath;
       if(currentPath == '/') return 'SmackChat';
       else if(currentPath == '/chat') return 'Chat';
       else if(currentPath == '/auth') return 'Login';
     }
+  },
+  methods: {
+	  ...mapActions('store', ['logoutUser'])
   }
-  // components: { EssentialLink },
-  // data () {
-  //   return {
-  //     leftDrawerOpen: false,
-  //     essentialLinks: linksData
-  //   }
-  // }
 }
 </script>
+
+<style>
+	.q-toolbar .q-btn {
+		line-height: 1.2;
+	}
+</style>
