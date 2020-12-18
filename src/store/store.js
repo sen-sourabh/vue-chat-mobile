@@ -1,13 +1,22 @@
 import { firebaseAuth, firebaseDb } from 'boot/firebase'; 
 
-const store = {
-    userDetails: {}
+const state = {
+    userDetails: {},
+    error: ''
 }
 
 const mutations = {
     setUserDetails(state, payload) {
         state.userDetails = payload;
         console.log(state.userDetails);
+    }, 
+    setError(state, message) {
+        state.error = message;
+        console.log(state.error);
+    },
+    setErrDefault(state, msg){
+        state.error = '';
+        console.log(state.error);
     }
 }
 
@@ -27,7 +36,7 @@ const actions = {
             console.log(error.message);
         })
     },
-    loginUser({}, payload) {
+    loginUser({ commit }, payload) {
         firebaseAuth.signInWithEmailAndPassword(payload.email, payload.password)
         .then(response => {
             console.log(response);
@@ -35,6 +44,7 @@ const actions = {
         })
         .catch(error => {
             console.log(error.message);
+            commit('setError', error.message);
         })
     },
     logoutUser() {
@@ -67,7 +77,7 @@ const getters = {
 
 export default {
     namespaced: true,
-    store,
+    state,
     mutations,
     actions,
     getters
