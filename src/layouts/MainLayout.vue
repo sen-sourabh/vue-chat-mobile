@@ -11,8 +11,7 @@
 				/> -->
 
 				<q-toolbar-title class="absolute-center">
-					{{title}} 
-					<!-- {{ userDetails.userId }} -->
+					{{title}}
 				</q-toolbar-title>
 
 				<q-btn 
@@ -24,16 +23,30 @@
 					label="Login" 
 					to="/auth"
 				/>
+
 				<q-btn 
 					v-else
 					@click="logoutUser"
-					class="absolute-right"
+					class="absolute-right width-38"
 					icon="account_circle"
 					no-caps
 					flat
-					dense
-					label="Logout"
+					title="Logout"
+					:label="userDetails.name"
 				/>
+
+				<q-dialog v-model="seamless" persistent>
+					<q-card class="bg-negative">
+						<q-card-section class="row items-center no-wrap">
+							<div>
+								<div class="text-h6 text-white text-weight-bold">Invalid email or password</div>
+							</div>
+							<q-space />
+							<q-btn class="text-h6 text-white" flat round icon="close" @click="seamless = false" />
+						</q-card-section>
+					</q-card>
+				</q-dialog>
+
 			</q-toolbar>
 		</q-header>
 		
@@ -46,18 +59,29 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 
-this.$forceUpdate();
-
 export default {
   name: 'MainLayout',
+  data() {
+	  return {
+		  loginError: '',
+		  seamless: false,
+		  cls: ''
+	  }
+  },
   computed: {
-    ...mapState('store', ['userDetails']),
+	...mapState('store', ['userDetails']),
+	...mapState('store', ['error']),
     title() {
       let currentPath = this.$route.fullPath;
       if(currentPath == '/') return 'SmackChat';
       else if(currentPath == '/chat') return 'Chat';
       else if(currentPath == '/auth') return 'Login';
     }
+  },
+  watch: {
+	  error: function(val) {
+		  this.seamless = true;
+	  }
   },
   methods: {
 	  ...mapActions('store', ['logoutUser'])
@@ -68,5 +92,15 @@ export default {
 <style>
 	.q-toolbar .q-btn {
 		line-height: 1.2;
+	}
+	.width-38 {
+		width: 38%;
+	}
+	.width-38 .q-icon,.q-btn .q-spinner {
+    	font-size: 2.2em;
+		margin-right: 4px;
+	}
+	.width-38 .block {
+		font-size: 1.1em;
 	}
 </style>
