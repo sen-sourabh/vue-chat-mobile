@@ -2,18 +2,21 @@
 	<q-layout view="lHh Lpr lFf">
 		<q-header elevated>
 			<q-toolbar>
-				<!-- <q-btn 
+				<q-btn 
 					v-if="title == 'Chat'"
+					class="absolute-left"
 					round
 					flat 
 					icon="arrow_back"
 					to="/" 
-				/> -->
-
-				<q-toolbar-title class="absolute-center">
-					{{title}}
+				/>
+			
+				<q-toolbar-title 
+					v-bind:class="title == 'Chat' ? 'q-ml-lg' : 'q-pt-sm q-ml-sm absolute-left'"	
+				>
+						{{title}}
 				</q-toolbar-title>
-
+				
 				<q-btn 
 					v-if="!userDetails.userId"
 					class="absolute-right"
@@ -74,7 +77,7 @@ export default {
     title() {
       let currentPath = this.$route.fullPath;
       if(currentPath == '/') return 'SmackChat';
-      else if(currentPath == '/chat') return 'Chat';
+      else if(currentPath == '/chat/:otherUserId') return 'Chat';
       else if(currentPath == '/auth') return 'Login';
     }
   },
@@ -94,7 +97,7 @@ export default {
 		line-height: 1.2;
 	}
 	.width-38 {
-		width: 38%;
+		width: 12%;
 	}
 	.width-38 .q-icon,.q-btn .q-spinner {
     	font-size: 2.2em;
@@ -102,5 +105,21 @@ export default {
 	}
 	.width-38 .block {
 		font-size: 1.1em;
+	}
+
+	@media (max-width: 1100px) {
+		.width-38 {
+			width: 50%;
+		}
+	}
+	@media (min-width: 700px) {
+		.width-38 {
+			width: 15%;
+		}
+	}
+	@media (max-width: 400px) {
+		.width-38 {
+			width: 50%;
+		}
 	}
 </style>

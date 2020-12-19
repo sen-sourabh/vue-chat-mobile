@@ -5,21 +5,21 @@
 			bordered
 		>
 			<q-item 
-				v-for="user in users" 
-				:key="user.id" 
+				v-for="(user, index) in users" 
+				:key="index" 
 				class="q-my-sm" 
 				clickable 
 				v-ripple
-				to="/chat"
+				:to="'/chat/'+index"
 			>
 				<q-item-section avatar>
 					<q-avatar color="primary" text-color="white">
-						{{ user.name.charAt(0) }}
+						{{ getNamesFirstLetter(user.name) }}
 					</q-avatar>
 				</q-item-section>
 
 				<q-item-section>
-					<q-item-label>{{ user.name }}</q-item-label>
+					<q-item-label>{{ getNameUpperCase(user.name) }}</q-item-label>
 				</q-item-section>
 
 				<q-item-section side>
@@ -32,33 +32,26 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'Users',
-  data () {
-    return {
-      users: [ 
-			{
-				id: 1,
-				name: 'Tarun',
-				online: true
-			}, 
-			{
-				id: 2,
-				name: 'Sushmita',
-				online: false
-			}, 
-			{
-				id: 3,
-				name: 'Kanchan',
-				online: false
-			}, 
-			{
-				id: 4,
-				name: 'Rahul',
-				online: true
-			} 
-		],
-    }
+  computed: {
+		...mapGetters('store', ['users']),
+  },
+  methods: {
+	  getNamesFirstLetter(value) {
+		  if(!value) { return '' }
+		  else {
+			  return value[0].toUpperCase();
+		  }
+	  },
+	  getNameUpperCase(value) {
+		  if(!value) { return '' }
+		  else {
+			  return value[0].toUpperCase() + value.substr(1);
+		  }
+	  }
   }
 }
 </script>

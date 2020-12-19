@@ -1,8 +1,13 @@
+import Vue from 'vue';
 import { firebaseAuth, firebaseDb } from 'boot/firebase'; 
+
+let messagesRef;
 
 const state = {
     userDetails: {},
-    error: ''
+    error: '',
+    users: {},
+    messages: {}
 }
 
 const mutations = {
@@ -17,6 +22,18 @@ const mutations = {
     setErrDefault(state, msg){
         state.error = '';
         console.log(state.error);
+    },
+    addUser(state, payload) {
+        Vue.set(state.users, payload.userId, payload.userDetails);
+    },
+    updateUser(state, payload) {
+        Object.assign(state.users[payload.userId], payload.userDetails);
+    },
+    addMessage(state, payload) {
+        Vue.set(state.messages, payload.messageId, payload.messageDetails);
+    },
+    clearMessages(state) {
+        state.messages = {};
     }
 }
 
@@ -50,7 +67,7 @@ const actions = {
     logoutUser() {
         firebaseAuth.signOut();
     },
-    handleAuthStateChanged({ commit }) {
+    handleAuthStateChanged({ commit, dispatch }) {
         firebaseAuth.onAuthStateChanged(user => {
             if(user) {
                 //User logged in
@@ -63,16 +80,79 @@ const actions = {
                         userId: userId
                     })
                 })
+                dispatch('firebaseUpdateUser', {
+                    userId: userId,
+                    updates: {
+                        online: true
+                    }
+                });
+                dispatch('firebaseGetUsers');
+                this.$router.push('/');
             } else {
                 //User logged out
+                dispatch('firebaseUpdateUser', {
+                    userId: state.userDetails.userId,
+                    updates: {
+                        online: false
+                    }
+                });
                 commit('setUserDetails', {});
+                this.$router.replace('/auth');
             }
         });
+    },
+    firebaseUpdateUser({}, payload) {
+        if(payload.userId)
+        firebaseDb.ref('user/' + payload.userId).update(payload.updates);
+    },
+    firebaseGetUsers({ commit }) {
+        firebaseDb.ref('user').on('child_added', snapshot => {
+            let userDetails = snapshot.val();
+            let userId = snapshot.key;
+            commit('addUser', {
+                userId,
+                userDetails
+            });
+        });
+        firebaseDb.ref('user').on('child_changed', snapshot => {
+            let userDetails = snapshot.val();
+            let userId = snapshot.key;
+            commit('updateUser', {
+                userId,
+                userDetails
+            });
+        });
+    },
+    firebaseGetMessages({ commit, state }, otherUserId) {
+        let userId = state.userDetails.userId;
+        messagesRef = firebaseDb.ref('chats/' + userId + '/' + otherUserId);
+        messagesRef.on('child_added', snapshot => {
+            let messageDetails = snapshot.val();
+            let messageId = snapshot.key;
+            commit('addMessage', {
+                messageId, 
+                messageDetails
+            });
+        });
+    },
+    firebaseStopGettingMessages({ commit }) {
+        if(messagesRef) {
+            messagesRef.off('child_added')
+            commit('clearMessages');
+        }
     }
 }
 
 const getters = {
-
+    users: state => {
+        let userFiltered = {};
+        Object.keys(state.users).forEach(key => {
+            if(key !== state.userDetails.userId){
+                userFiltered[key] = state.users[key];
+            }
+        })
+        return userFiltered;
+    }
 }
 
 export default {

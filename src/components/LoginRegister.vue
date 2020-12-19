@@ -47,8 +47,8 @@ export default {
         return {
             formData: {
                 name: '',
-                email: '',
-                password: ''
+                email: 'sourabhsen@gmail.com',
+                password: 'nbe19969'
             }
         }
     },

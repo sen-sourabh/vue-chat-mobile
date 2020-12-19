@@ -45,31 +45,20 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
+
 export default {
   name: 'PageChat',
   data() {
 	  return {
-		  newMessage: '',
-		  messages: [ 
-			  	{
-					from: 'me',
-					text: 'Hey, How are you?'
-
-				},
-				{
-					from: 'them',
-					text: 'Good thanks, What about you?'
-
-				},
-				{
-					from: 'me',
-					text: 'Pretty good!'
-
-				},
-		  	]
+		  newMessage: ''
 	  }
   },
+  computed: {
+	  ...mapState('store', ['messages']),
+  },
   methods: {
+	  ...mapActions('store', ['firebaseGetMessages', 'firebaseStopGettingMessages']),
 	  sendMessage() {
 		  this.messages.push({
 			  from: 'me',
@@ -77,6 +66,12 @@ export default {
 		  });
 		  this.newMessage = "";
 	  }
+  },
+  mounted() {
+	  this.firebaseGetMessages(this.$route.params.otherUserId);
+  },
+  destroyed() {
+	  this.firebaseStopGettingMessages();
   }
 }
 </script>
