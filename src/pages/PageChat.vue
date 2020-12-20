@@ -22,6 +22,7 @@
 				>
 					<q-input 
 						class="q-mt-md"
+						@blur="scrollToBottom"
 						bg-color="white"
 						:rounded="true"
 						:outlined="true"
