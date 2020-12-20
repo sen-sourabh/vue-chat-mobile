@@ -11,13 +11,11 @@
 					to="/" 
 				/>
 			
-				<q-toolbar-title 
-					v-bind:class="title == 'Chat' ? 'q-ml-lg' : 'q-pt-sm q-ml-sm absolute-left'"	
-				>
-						{{title}}
+				<q-toolbar-title class='absolute-center'>
+						{{ title == 'Chat' ? otherUserDetails.name : title }}
 				</q-toolbar-title>
 				
-				<q-btn 
+				<!-- <q-btn 
 					v-if="!userDetails.userId"
 					class="absolute-right"
 					icon="account_circle"
@@ -25,13 +23,12 @@
 					flat
 					label="Login" 
 					to="/auth"
-				/>
+				/> -->
 
 				<q-btn 
-					v-else
+					v-if="userDetails.userId"
 					@click="logoutUser"
-					class="absolute-right width-38"
-					icon="account_circle"
+					class="logout absolute-right width-38"
 					no-caps
 					flat
 					title="Logout"
@@ -68,7 +65,8 @@ export default {
 	  return {
 		  loginError: '',
 		  seamless: false,
-		  cls: ''
+		  cls: '',
+		//   otherUserDetail: this.$store.state.store.users[this.$route.params.otherUserId]
 	  }
   },
   computed: {
@@ -76,10 +74,16 @@ export default {
 	...mapState('store', ['error']),
     title() {
       let currentPath = this.$route.fullPath;
-      if(currentPath == '/') return 'SmackChat';
-      else if(currentPath == '/chat/:otherUserId') return 'Chat';
-      else if(currentPath == '/auth') return 'Login';
-    }
+      if(currentPath == '/') return 'LetsChat';
+      else if(currentPath.includes('/chat')) return 'Chat';
+      else if(currentPath == '/auth') return 'LetsChat';
+	},
+	otherUserDetails() {
+		if(this.$store.state.store.users[this.$route.params.otherUserId]) {
+			  return this.$store.state.store.users[this.$route.params.otherUserId];
+		} 
+		return {};
+	}
   },
   watch: {
 	  error: function(val) {
@@ -97,29 +101,26 @@ export default {
 		line-height: 1.2;
 	}
 	.width-38 {
-		width: 12%;
+		width: 10%;
 	}
-	.width-38 .q-icon,.q-btn .q-spinner {
-    	font-size: 2.2em;
-		margin-right: 4px;
-	}
-	.width-38 .block {
+	.logout .block {
 		font-size: 1.1em;
+		display: block;
 	}
 
-	@media (max-width: 1100px) {
-		.width-38 {
-			width: 50%;
-		}
-	}
-	@media (min-width: 700px) {
+	@media (max-width: 850px) {
 		.width-38 {
 			width: 15%;
 		}
 	}
-	@media (max-width: 400px) {
+	@media (max-width: 550px) {
 		.width-38 {
-			width: 50%;
+			width: 20%;
+		}
+	}
+	@media (max-width: 350px) {
+		.width-38 {
+			width: 30%;
 		}
 	}
 </style>
