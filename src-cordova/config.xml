@@ -7,6 +7,9 @@
     </author>
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" spec="1" />
+    <plugin name="cordova-plugin-splashscreen" source="npm" />
+    <splash src="https://github.com/sen-sourabh/vue-chat-mobile/blob/master/public%2FLetsChat-Logo.png" />
+    <preference name="SplashScreenDelay" value="6000" />
     <access origin="*" />
     <allow-intent href="http://192.168.0.10:8080/#/" />
     <allow-intent href="https://*/*" />
