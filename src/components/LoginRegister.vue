@@ -1,6 +1,6 @@
 <template>
     <div>
-        <q-form @submit="submitForm">
+        <q-form @reset="onReset" @submit="submitForm">
             <q-input 
                 v-if="tab == 'register'"
                 dense
@@ -8,6 +8,7 @@
                 outlined
                 class="q-mb-sm"
                 label="Name"
+                :rules="[ val => val && val.length > 0 || '* Name is required.' ]"
             />
             <q-input 
                 dense
@@ -16,6 +17,7 @@
                 outlined
                 class="q-mb-sm"
                 label="Email"
+                :rules="[ val => !!val || '* Email is required.', isValidEmail ]"
             />
             <q-input 
                 type="password"
@@ -24,6 +26,7 @@
                 v-model="formData.password"
                 outlined
                 class="q-mb-sm"
+                :rules="[ val => val && val.length > 0 || '* Password is required.' ]"
             />
             <div class="row">
                 <q-space />
@@ -47,8 +50,8 @@ export default {
         return {
             formData: {
                 name: '',
-                email: 'sourabhsen@gmail.com',
-                password: 'nbe19969'
+                email: '',
+                password: ''
             }
         }
     },
@@ -60,7 +63,11 @@ export default {
             } else { 
                 this.registerUser(this.formData);
             }
-        }
+        },
+        isValidEmail (val) {
+            const emailPattern = /^(?=[a-zA-Z0-9@._%+-]{6,254}$)[a-zA-Z0-9._%+-]{1,64}@(?:[a-zA-Z0-9-]{1,63}\.){1,8}[a-zA-Z]{2,63}$/;
+            return emailPattern.test(val) || 'Invalid email';
+        },
     }
 }
 </script>

@@ -1,8 +1,8 @@
 {
-  "name": "vue-chat-mobile",
+  "name": "letschat",
   "version": "0.0.1",
   "description": "first chat App",
-  "productName": "vue-chat-mobile",
+  "productName": "LetsChat",
   "author": "Sourabh",
   "private": true,
   "scripts": {

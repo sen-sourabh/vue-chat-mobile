@@ -3,17 +3,39 @@
 		<q-banner v-if="!otherUserDetails.online" class="text-white text-center bg-red">
 			{{ otherUserDetails.name }} is offline.
 		</q-banner>
+		<center class="fixed-center">
+			<div v-if="!showMessages">
+				<q-spinner-comment color="primary" size="6em"/>
+			</div>
+		</center>
+		
 		<div
-			:class="{ 'invisible': !showMessages }" 
-			class="q-pa-md column col justify-end">
+			class="q-px-sm q-pb-md q-pt-md column col justify-end"
+			:class="{ 'invisible': !showMessages,
+			 '': focus_message }" 
+		>
+			
 			<q-chat-message
 				:class="{'gap-chat' : !otherUserDetails.online}"
 				v-for="(message, index) in messages"
 				:key="index"
-				:name="message.from == 'me' ? 'You' : otherUserDetails.name "
+				:name="message.from == 'me' ? 'You' : otherUserDetails.name"
 				:text="[message.text]"
 				:sent="message.from == 'me' ? true : false"
-			/>
+				size="8"
+			>
+				<template v-slot:avatar>
+					<q-avatar v-if="message.from !== 'me'" class="q-mr-sm" color="white" text-color="primary">
+						{{ getNamesFirstLetter(otherUserDetails.name) }}
+					</q-avatar>
+					<q-avatar v-else color="primary" class="q-ml-sm" text-color="white">
+						{{ getNamesFirstLetter(userDetails.name) }}
+					</q-avatar>
+				</template>
+			</q-chat-message>
+			<div v-if="focus_message">
+				You are typing... <q-spinner-dots size="2rem" />
+			</div>
 		</div> 
 		<q-footer elevated>
 			<q-toolbar >
@@ -36,6 +58,7 @@
 						:autocapitalize="true"
 						:autocomplete="true"
 						:spellcheck="true"
+						@focus="onFocusIn"
 					>
 						
 						<template v-slot:after>
@@ -65,7 +88,8 @@ export default {
   data() {
 	  return {
 		  newMessage: '',
-		  showMessages: false
+		  showMessages: false,
+		  focus_message: false
 	  }
   },
   computed: {
@@ -78,39 +102,52 @@ export default {
 		}
   },
   watch: {
-	  messages: function(value) {
-		  if(Object.keys(value).length) {
-			  this.scrollToBottom();
-			  setTimeout(() => {
-				  this.showMessages = true;
-			  }, 200);
-		  }
-	  }
+	  	messages: function(value) {
+		  	if(Object.keys(value).length) {
+			  	this.scrollToBottom();
+			  	setTimeout(() => {
+					this.showMessages = true;
+			  	}, 1000);
+		  	}
+	  	}
   },
   methods: {
 	  	...mapActions('store', ['firebaseGetMessages', 'firebaseStopGettingMessages', 'firebaseSendMessage']),
 	  	sendMessage() {
-		  	this.firebaseSendMessage({
-			  	message: {
-					from: 'me',
-			  		text: this.newMessage
-			  	},
-			  	otherUserId: this.$route.params.otherUserId
-			});
+			if(this.newMessage){
+				this.firebaseSendMessage({
+					message: {
+						from: 'me',
+						text: this.newMessage
+					},
+					otherUserId: this.$route.params.otherUserId
+				});
+			} else {
+				return false;
+			}
 			this.clearMessage();
 		},
 		clearMessage() {
 			this.newMessage = '';
-			this.$refs.newMsg.focus();
 			this.$refs.newMsg.resetValidation();
 		},
 		scrollToBottom() {
-			// console.log(this.$refs.pageChat);
+			this.focus_message = false;
 			let pageChat = this.$refs.pageChat.$el;
 			setTimeout(() => {
 				window.scrollTo(0, pageChat.scrollHeight)
-			}, 20);
-		}
+			}, 200);
+		},
+		getNamesFirstLetter(value) {
+			if(!value) { return '' }
+			else {
+				return value[0].toUpperCase();
+			}
+		},
+		onFocusIn(value) {
+			this.scrollToBottom();
+			this.focus_message = true;
+		},
   },
   mounted() {
 	  this.firebaseGetMessages(this.$route.params.otherUserId);
@@ -146,6 +183,6 @@ export default {
 	opacity: 0.8;
 }
 .gap-chat {
-	padding-top: 55px;
+	padding-top: 30px;
 }
 </style>
