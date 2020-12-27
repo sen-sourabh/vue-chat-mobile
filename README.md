@@ -1,6 +1,6 @@
 # vue-chat-mobile (vue-chat-mobile)
 
-first chat App
+LetsChat App
 
 ## Install the dependencies
 ```bash
@@ -15,6 +15,13 @@ quasar dev
 
 ### Build the app for production
 ```bash
+
+```For debugg apk
+quasar build --debug
+
+```For release apk
+quasar build --release
+
 quasar build
 ```
 
