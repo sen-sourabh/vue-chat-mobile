@@ -43,6 +43,9 @@ const actions = {
         .then(response => {
             console.log(response);
             let userId = firebaseAuth.currentUser.uid;
+            if(firebaseAuth.currentUser.email == undefined || firebaseAuth.currentUser.name == undefined){
+                this.$router.push('/auth');
+            }
             firebaseDb.ref('user/' + userId).set({
                 name: payload.name,
                 email: payload.email,
@@ -72,22 +75,26 @@ const actions = {
             if(user) {
                 //User logged in
                 let userId = firebaseAuth.currentUser.uid;
-                firebaseDb.ref('user/' + userId).once('value', snapshot => { 
-                    let userDetails = snapshot.val();
-                    commit('setUserDetails', {
-                        name: userDetails.name,
-                        email: userDetails.email,
-                        userId: userId
+                if(firebaseAuth.currentUser.email == undefined || firebaseAuth.currentUser.name == undefined){
+                    this.$router.push('/auth');
+                } else {
+                    firebaseDb.ref('user/' + userId).once('value', snapshot => { 
+                        let userDetails = snapshot.val();
+                        commit('setUserDetails', {
+                            name: userDetails.name,
+                            email: userDetails.email,
+                            userId: userId
+                        })
                     })
-                })
-                dispatch('firebaseUpdateUser', {
-                    userId: userId,
-                    updates: {
-                        online: true
-                    }
-                });
-                dispatch('firebaseGetUsers');
-                this.$router.push('/');
+                    dispatch('firebaseUpdateUser', {
+                        userId: userId,
+                        updates: {
+                            online: true
+                        }
+                    });
+                    dispatch('firebaseGetUsers');
+                    this.$router.push('/');
+                }
             } else {
                 //User logged out
                 dispatch('firebaseUpdateUser', {
