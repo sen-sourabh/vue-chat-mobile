@@ -45,12 +45,13 @@ const actions = {
             let userId = firebaseAuth.currentUser.uid;
             if(firebaseAuth.currentUser.email == undefined || firebaseAuth.currentUser.name == undefined){
                 this.$router.push('/auth');
-            }
-            firebaseDb.ref('user/' + userId).set({
-                name: payload.name,
-                email: payload.email,
-                online: true
-            })
+            } else {
+                firebaseDb.ref('user/' + userId).set({
+                    name: payload.name,
+                    email: payload.email,
+                    online: true
+                })
+            }            
         })
         .catch(error => {
             console.log(error.message);
